@@ -122,7 +122,7 @@ class CodeLevelOptimizations:
       return __make_lr_annealing(context['critic_annealing_class'],
                                  **context['critic_annealing_kwargs'])
 
-   def anneal_learning_rate(context, scheduler):
+   def anneal_learning_rate(scheduler):
       """ Update the given sheduler. Noop if the scheduler is None """
       if scheduler is None:
          return
