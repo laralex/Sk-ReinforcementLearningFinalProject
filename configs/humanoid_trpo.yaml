@@ -1,0 +1,40 @@
+gym_env: 'Humanoid-v2'
+timesteps_per_iteration: 2048
+discount:                0.99
+gae_discount:            0.95
+
+# value function
+critic:
+  hidden_layers:    [64, 64]
+  lr:               0.0003
+  n_epochs:         10
+
+trpo:
+  kl_constraint:           0.07
+  fisher_estim_fraction:   0.1
+  conjugate_grad_steps:    10
+  conjugate_grad_damping:  0.1
+  backtracking_steps:      10
+
+actor:
+  hidden_layers:    [64, 64]
+  lr:               Null
+  n_epochs:         Null
+
+ppo:
+  clipping_epsilon: Null
+
+code_level_opt:
+  critic_loss_clpping:     False
+  entropy_coefficient:     0.0
+  reward_clipping:         Null
+  state_clipping:          Null
+  gradient_clipping_l2:    Null
+  activation_func:         "relu"
+  layers_initialization:   "xavier"
+  state_normalization:     False
+  returns_normalization:   False
+  rewards_normalization:   False
+  actor_annealing_class:   Null
+  critic_annealing_class:  Null
+

@@ -1,0 +1,21 @@
+# NOTE: install MuJoCo, MuJoCo-Py into your operating system
+
+# MuJoCo-Py repository:
+# https://github.com/openai/mujoco-py/
+
+# MuJoCo website
+# https://www.roboti.us/download.html
+
+# Installation guide for Windows OS:
+#https://medium.com/@sayanmndl21/install-openai-gym-with-box2d-and-mujoco-in-windows-10-e25ee9b5c1d5
+
+# This project requirements
+python=3.9.7
+numpy=1.21.2
+mujoco-py=2.0
+matplotlib=3.4.3
+tqdm=4.62.3
+pytorch=1.9.1
+torchvision=0.2.2
+jupyter=1.0.0
+pyyaml=6.0

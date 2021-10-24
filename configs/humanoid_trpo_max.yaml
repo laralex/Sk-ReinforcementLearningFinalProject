@@ -1,0 +1,47 @@
+gym_env: 'Humanoid-v2'
+timesteps_per_iteration: 2048
+discount:                0.99
+gae_discount:            0.85
+
+# value function
+critic:
+  hidden_layers:    [64, 64]
+  lr:               0.00005
+  n_epochs:         10
+
+trpo:
+  kl_constraint:           0.1
+  fisher_estim_fraction:   0.1
+  conjugate_grad_steps:    10
+  conjugate_grad_damping:  0.1
+  backtracking_steps:      10
+
+actor:
+  hidden_layers:    [64, 64]
+  lr:               Null
+  n_epochs:         Null
+
+ppo:
+  clipping_epsilon: Null
+
+code_level_opt:
+  critic_loss_clpping:     False
+  entropy_coefficient:     0.0
+  reward_clipping:         [-10.0, 10.0]
+  state_clipping:          [-10.0, 10.0]
+  gradient_clipping_l2:    0.5
+  activation_func:         "tanh"
+  layers_initialization:   "orthogonal"
+  state_normalization:     True
+  returns_normalization:   True
+  rewards_normalization:   False
+  actor_annealing_class:   "StepLR"
+  actor_annealing_kwargs:
+    step_size: 2
+    gamma: 0.5
+  critic_annealing_class:  "StepLR"
+  critic_annealing_kwargs:
+    step_size: 2
+    gamma: 0.5
+
+
