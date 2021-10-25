@@ -1,4 +1,4 @@
-from code_level_optim import CodeLevelOptimizations
+from .code_level_optim import CodeLevelOptimizations
 
 import numpy as np
 import torch
@@ -6,6 +6,7 @@ import torch.nn as nn
 
 class Critic(nn.Module):
    def __init__(self, critic_config, code_level_config, input_size):
+      super().__init__()
       self.input_size = input_size
       hidden_layers = critic_config['hidden_layers']
       assert isinstance(hidden_layers, list)

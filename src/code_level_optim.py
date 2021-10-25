@@ -1,10 +1,9 @@
-from typing_extensions import ParamSpecArgs
-
-from tqdm.utils import _environ_cols_wrapper
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+
+from .utility import parse_config
 
 class StdNormalizer:
    """
@@ -22,7 +21,7 @@ class StdNormalizer:
       self.history_sum     += self.history[-1]
       self.history_sum_sqr += self.history[-1]**2
 
-   def __normalize(self, raw_value):
+   def normalize(self, raw_value):
       # variance(X) = [ (\sum x^2) - (\sum x)^2/n ] / (n-1)
       N = len(self.history)
       var = ( self.history_sum_sqr - self.history_sum**2 / N ) / (N - 1)
@@ -53,7 +52,7 @@ class CodeLevelOptimizations:
       target_values = old_values + advantages
       unclipped_loss = (values - target_values).pow(2)
       if context['critic_loss_clpping']:
-         clipped_values = torch.clamp(current_values,
+         clipped_values = torch.clip(current_values,
             min=old_values - ppo_epsilon, max=old_values + ppo_epsilon)
          clipped_loss = (clipped_values - target_values).pow(2)
          return max(unclipped_loss, clipped_loss)
@@ -69,9 +68,9 @@ class CodeLevelOptimizations:
       """
       normalizer.add_raw_reward(reward, gamma)
       if context['returns_normalization']:
-         returns = normalizer.__normalize(returns)
+         returns = normalizer.normalize(returns)
       if context['rewards_normalization']:
-         reward = normalizer.__normalize(reward)
+         reward = normalizer.normalize(reward)
       return reward, returns
 
    # <Optimization #3>
@@ -83,23 +82,24 @@ class CodeLevelOptimizations:
       with the given gain
       The gain can be determined from context['actionvation_func'], if orthogonal_gain=None
       """
-      if len(layer.data.shape) < 2:
-         layer.data.zero_()
-         return
+      for p in layer.parameters():
+         if len(p.data.shape) < 2:
+            p.data.zero_()
+            return
 
-      if context['layers_initialization'] == "orthogonal":
-         if orthogonal_gain is None:
-            if context['activation_func'] == "relu":
-               orthogonal_gain = np.sqrt(2)
-            elif context['activation_func'] == "tanh":
-               orthogonal_gain = 1.0
-            else:
-               raise NotImplementedError("Unsupported activation")
-         nn.init.orthogonal_(layer.data, gain=orthogonal_gain)
-      elif context['layers_initialization'] == "xavier":
-         nn.init.xavier_uniform_(layer.data)
-      else:
-         raise NotImplementedError("Unsupported initialization")
+         if context['layers_initialization'] == "orthogonal":
+            if orthogonal_gain is None:
+               if context['activation_func'] == "relu":
+                  orthogonal_gain = np.sqrt(2)
+               elif context['activation_func'] == "tanh":
+                  orthogonal_gain = 1.0
+               else:
+                  raise NotImplementedError("Unsupported activation")
+            nn.init.orthogonal_(p.data, gain=orthogonal_gain)
+         elif context['layers_initialization'] == "xavier":
+            nn.init.xavier_uniform_(p.data)
+         else:
+            raise NotImplementedError("Unsupported initialization")
 
 
    # <Optimization #4>
@@ -115,12 +115,12 @@ class CodeLevelOptimizations:
       return SchedulerClass(optimizer, **kwargs)
 
    def make_actor_lr_annealing(context: dict, optimizer):
-      return __make_lr_annealing(context['actor_annealing_class'],
-                                 **context['actor_annealing_kwargs'])
+      return CodeLevelOptimizations.__make_lr_annealing(
+         context['actor_annealing_class'], optimizer, **context['actor_annealing_kwargs'])
 
    def make_critic_lr_annealing(context: dict, optimizer):
-      return __make_lr_annealing(context['critic_annealing_class'],
-                                 **context['critic_annealing_kwargs'])
+      return CodeLevelOptimizations.__make_lr_annealing(
+         context['critic_annealing_class'], optimizer, **context['critic_annealing_kwargs'])
 
    def anneal_learning_rate(scheduler):
       """ Update the given sheduler. Noop if the scheduler is None """
@@ -138,7 +138,7 @@ class CodeLevelOptimizations:
       if context['reward_clipping'] is None:
          return reward
       min_val, max_val = context['reward_clipping']
-      return torch.clamp(reward, min_val, max_val)
+      return np.clip(reward, min_val, max_val)
 
    # <Optimization #6>
    def normalize_state(context: dict, state):
@@ -161,7 +161,7 @@ class CodeLevelOptimizations:
       if context['state_clipping'] is None:
          return state
       min_val, max_val = context['state_clipping']
-      return torch.clamp(state, min_val, max_val)
+      return np.clip(state, min_val, max_val)
 
    # <Optimization #8>
    def activation_func(context: dict, activations):
