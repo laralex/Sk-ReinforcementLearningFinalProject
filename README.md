@@ -62,4 +62,4 @@ removed) and true TRPO is very small, while default PPO is by far better.
 Moreover, in TRPO+ (TRPO with code-level optimizations added) performs similarly
 (if not better) than default PPO.
 
-![i](materials/paper-result.png)
+![image here](https://github.com/laralex/Sk-reinforcement-learning/blob/main/materials/paper-result.PNG)
