@@ -53,7 +53,7 @@ described in [its paper](https://arxiv.org/abs/1502.05477) (and we didn't want
 to copy-paste implementation from the [Implementation matters
 repository](https://github.com/MadryLab/implementation-matters)).
 
-Thus we don't out own results to present. Apologies for that! 
+Thus we don't have our own results to present. Apologies for that! 
 
 But we want to reference the paper's results (not ours), that in fact code-level
 optimizations are what majorily contributes to PPO performance. In the table you
