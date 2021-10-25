@@ -63,3 +63,12 @@ Moreover, in TRPO+ (TRPO with code-level optimizations added) performs similarly
 (if not better) than default PPO.
 
 ![image here](https://github.com/laralex/Sk-reinforcement-learning/blob/main/materials/paper-result.PNG)
+
+* AAI here is Average Algorithmic Improvement, it measures maximal effect of switching core algorithms. It's defined as 
+```
+AAI = max[ |PPO - TRPO+|, |PPO-M - TRPO| ]
+```
+* ACLI here is Average Code-Level Improvement, it measures maximal effect of adding code-level optimizations. It's defined as 
+```
+ACLI = max[ |PPO - PPO-M|, |TRPO+ - TRPO| ]
+```
